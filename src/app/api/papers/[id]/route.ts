@@ -5,10 +5,10 @@ import { attachRankingSignals } from "@/services/ranking/signals";
 
 export const dynamic = "force-dynamic";
 
-type RouteContext = { params: { id: string } };
+type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_req: Request, context: RouteContext) {
-  const { id } = context.params;
+  const { id } = await context.params;
   const pool = tryGetPool();
   if (!pool) {
     return NextResponse.json({ error: "DATABASE_URL is not configured" }, { status: 503 });
