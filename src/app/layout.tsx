@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-
 export const metadata: Metadata = {
-  title: "ResearchCard — research intelligence in under a minute",
+  title: "ResearchCard BioIntel — interactive pharma research discovery",
   description:
-    "Open-access paper discovery with transparent, abstract-grounded AI cards for biomedical and pharma research.",
+    "Explore open-access biomedical papers with an interactive biotech interface, transparent AI summaries, and source-grounded research signals.",
 };
 
 export default function RootLayout({
@@ -17,18 +14,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} min-h-screen bg-slate-50 font-sans text-slate-900 antialiased`}>
-        <header className="border-b border-slate-200 bg-white">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-            <a href="/" className="text-xl font-bold tracking-tight text-violet-800">
-              ResearchCard
+      <body className="min-h-screen font-sans antialiased">
+        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+          <div className="hero-orb hero-orb-a" />
+          <div className="hero-orb hero-orb-b" />
+          <div className="hero-orb hero-orb-c" />
+          <div className="tech-grid" />
+        </div>
+
+        <header className="sticky top-0 z-20 border-b border-cyan-100/10 bg-slate-950/70 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+            <a href="/" className="text-xl font-bold tracking-tight text-cyan-50">
+              ResearchCard <span className="text-cyan-300">BioIntel</span>
             </a>
-            <p className="hidden text-sm text-slate-600 sm:block">
-              Abstract-grounded AI · Always link to sources · Uncertainty first
+            <p className="hidden text-sm text-cyan-100/75 sm:block">
+              Transparent AI synthesis · Source-first science · Uncertainty visible
             </p>
           </div>
         </header>
-        <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+        <main className="mx-auto max-w-6xl px-4 py-8 md:py-10">{children}</main>
       </body>
     </html>
   );

@@ -34,28 +34,31 @@ export default async function AuthorPage({ params }: { params: { id: string } })
 
   return (
     <div className="space-y-6">
-      <Link href="/" className="text-sm font-medium text-violet-700 hover:underline">
+      <Link href="/" className="text-sm font-medium text-cyan-300 hover:text-cyan-200 hover:underline">
         ← Back to discovery
       </Link>
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">{author.name}</h1>
+      <section className="lab-panel p-6">
+        <h1 className="text-3xl font-bold text-cyan-50">{author.name}</h1>
         {author.orcid && (
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-cyan-100/75">
             ORCID:{" "}
-            <a className="text-violet-700 hover:underline" href={`https://orcid.org/${author.orcid}`}>
+            <a className="text-cyan-300 hover:text-cyan-200 hover:underline" href={`https://orcid.org/${author.orcid}`}>
               {author.orcid}
             </a>
           </p>
         )}
         <div className="mt-4">
-          <h2 className="text-sm font-semibold uppercase text-slate-500">AI research interest tags</h2>
-          <p className="text-xs text-slate-500">
+          <h2 className="text-sm font-semibold uppercase text-cyan-100/65">AI research interest tags</h2>
+          <p className="text-xs text-cyan-100/65">
             Generated from aggregated titles/abstracts; coarse themes only — not a career profile.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {tags.length === 0 && <span className="text-sm text-slate-500">No tags yet.</span>}
+            {tags.length === 0 && <span className="text-sm text-cyan-100/70">No tags yet.</span>}
             {tags.map((t) => (
-              <span key={t} className="rounded-full bg-violet-50 px-3 py-1 text-sm text-violet-900">
+              <span
+                key={t}
+                className="rounded-full border border-cyan-100/20 bg-slate-950/45 px-3 py-1 text-sm text-cyan-100"
+              >
                 {t}
               </span>
             ))}
@@ -63,8 +66,8 @@ export default async function AuthorPage({ params }: { params: { id: string } })
         </div>
       </section>
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold text-slate-900">Aggregated papers</h2>
-        {papers.length === 0 && <p className="text-sm text-slate-500">No linked papers.</p>}
+        <h2 className="lab-heading text-xl">Aggregated papers</h2>
+        {papers.length === 0 && <p className="text-sm text-cyan-100/70">No linked papers.</p>}
         {papers.map((p) => (
           <ResearchCard key={p.id} paper={p} compact />
         ))}

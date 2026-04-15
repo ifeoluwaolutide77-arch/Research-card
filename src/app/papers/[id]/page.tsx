@@ -16,13 +16,13 @@ export default async function PaperPage({ params }: { params: { id: string } }) 
 
   return (
     <div className="space-y-6">
-      <Link href="/" className="text-sm font-medium text-violet-700 hover:underline">
+      <Link href="/" className="text-sm font-medium text-cyan-300 hover:text-cyan-200 hover:underline">
         ← Back to discovery
       </Link>
       <ExpandedCard paper={ranked} />
       {ranked.ranking && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
-          <h2 className="text-base font-semibold text-slate-900">Ranking signals (transparent)</h2>
+        <section className="lab-panel p-4 text-sm text-cyan-100/85">
+          <h2 className="text-base font-semibold text-cyan-50">Ranking signals (transparent)</h2>
           <ul className="mt-2 grid gap-2 md:grid-cols-2">
             <li>Recency: {ranked.ranking.recency.toFixed(1)}</li>
             <li>Quantitative density: {ranked.ranking.quantitative.toFixed(1)}</li>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import type { PaperWithSummary } from "@/lib/types/models";
 import { TrustBadge } from "@/components/TrustBadge";
 
@@ -28,37 +29,46 @@ export function ResearchCard(props: { paper: PaperWithSummary; compact?: boolean
   }
 
   return (
-    <article className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <motion.article
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      whileHover={{ y: -4 }}
+      className="lab-panel group flex flex-col gap-3 p-4"
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+          <div className="text-xs font-medium uppercase tracking-wide text-cyan-100/70">
             {paper.source} · {paper.journal ?? "Preprint / journal N/A"}
           </div>
-          <h3 className="mt-1 text-lg font-semibold text-slate-900">
-            <Link href={`/papers/${paper.id}`} className="hover:underline">
+          <h3 className="mt-1 text-lg font-semibold text-cyan-50">
+            <Link href={`/papers/${paper.id}`} className="hover:text-cyan-200 hover:underline">
               {paper.title}
             </Link>
           </h3>
         </div>
-        <a
+        <motion.a
           href={paper.url}
           target="_blank"
           rel="noreferrer"
-          className="shrink-0 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-800"
+          whileTap={{ scale: 0.98 }}
+          whileHover={{ y: -1 }}
+          className="shrink-0 rounded-full border border-cyan-200/25 bg-cyan-500/20 px-3 py-1 text-xs font-semibold text-cyan-50 transition-colors hover:bg-cyan-500/35"
         >
           Original source
-        </a>
+        </motion.a>
       </div>
 
       {paper.summary?.one_liner && (
-        <p className="text-sm text-slate-700">
-          <span className="font-semibold text-violet-700">AI one-liner: </span>
+        <p className="rounded-lg border border-cyan-100/15 bg-cyan-500/10 p-2.5 text-sm text-cyan-50/90">
+          <span className="font-semibold text-cyan-200">AI one-liner: </span>
           {paper.summary.one_liner}
         </p>
       )}
 
       {!props.compact && paper.summary && (
-        <dl className="grid gap-2 text-sm text-slate-700 md:grid-cols-2">
+        <dl className="grid gap-2 text-sm text-cyan-100/85 md:grid-cols-2">
           <Field label="Problem" value={paper.summary.problem} />
           <Field label="Objective" value={paper.summary.objective} />
           <Field label="Methods" value={paper.summary.methods} />
@@ -71,7 +81,10 @@ export function ResearchCard(props: { paper: PaperWithSummary; compact?: boolean
       {paper.summary?.tags && paper.summary.tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {paper.summary.tags.map((t) => (
-            <span key={t} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+            <span
+              key={t}
+              className="rounded-full border border-cyan-200/20 bg-slate-950/45 px-2.5 py-0.5 text-xs text-cyan-100/90"
+            >
               {t}
             </span>
           ))}
@@ -81,51 +94,57 @@ export function ResearchCard(props: { paper: PaperWithSummary; compact?: boolean
       <TrustBadge confidence={paper.summary?.confidence} sourceLabel={paper.summary?.source_label} />
 
       {paper.summary?.ai_disclaimer && (
-        <p className="text-xs text-slate-500">{paper.summary.ai_disclaimer}</p>
+        <p className="text-xs text-cyan-100/65">{paper.summary.ai_disclaimer}</p>
       )}
 
       {paper.summary?.uncertain && paper.summary.uncertainty_notes && (
-        <p className="text-xs font-medium text-amber-800">Uncertainty: {paper.summary.uncertainty_notes}</p>
+        <p className="rounded-lg border border-amber-200/25 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-100">
+          Uncertainty: {paper.summary.uncertainty_notes}
+        </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-3 text-sm">
-        <span className="text-slate-500">Was this card helpful?</span>
-        <button
+      <div className="flex flex-wrap items-center gap-3 border-t border-cyan-100/10 pt-3 text-sm">
+        <span className="text-cyan-100/70">Was this card helpful?</span>
+        <motion.button
           type="button"
           disabled={busy}
+          whileTap={{ scale: 0.97 }}
+          whileHover={{ y: -1 }}
           onClick={() => vote(1)}
-          className="rounded-lg border border-slate-200 px-3 py-1 hover:bg-slate-50 disabled:opacity-50"
+          className="rounded-lg border border-cyan-200/20 bg-cyan-500/10 px-3 py-1 transition-colors hover:bg-cyan-500/20 disabled:opacity-50"
         >
           👍
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           type="button"
           disabled={busy}
+          whileTap={{ scale: 0.97 }}
+          whileHover={{ y: -1 }}
           onClick={() => vote(-1)}
-          className="rounded-lg border border-slate-200 px-3 py-1 hover:bg-slate-50 disabled:opacity-50"
+          className="rounded-lg border border-cyan-200/20 bg-cyan-500/10 px-3 py-1 transition-colors hover:bg-cyan-500/20 disabled:opacity-50"
         >
           👎
-        </button>
-        <span className="text-xs text-slate-400">
+        </motion.button>
+        <span className="text-xs text-cyan-100/60">
           {paper.engagement.thumbs_up}↑ {paper.engagement.thumbs_down}↓
         </span>
-        {msg && <span className="text-xs text-slate-600">{msg}</span>}
+        {msg && <span className="text-xs text-cyan-100/80">{msg}</span>}
       </div>
 
       {paper.authors.length > 0 && (
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-cyan-100/70">
           Authors:{" "}
           {paper.authors.map((a, i) => (
             <span key={a.id}>
               {i > 0 ? ", " : ""}
-              <Link href={`/authors/${a.id}`} className="text-violet-700 hover:underline">
+              <Link href={`/authors/${a.id}`} className="text-cyan-300 hover:text-cyan-200 hover:underline">
                 {a.name}
               </Link>
             </span>
           ))}
         </div>
       )}
-    </article>
+    </motion.article>
   );
 }
 
@@ -133,8 +152,8 @@ function Field(props: { label: string; value: string | null | undefined }) {
   if (!props.value) return null;
   return (
     <div>
-      <dt className="text-xs font-semibold uppercase text-slate-500">{props.label}</dt>
-      <dd className="mt-0.5">{props.value}</dd>
+      <dt className="text-xs font-semibold uppercase text-cyan-100/60">{props.label}</dt>
+      <dd className="mt-0.5 text-cyan-50/90">{props.value}</dd>
     </div>
   );
 }

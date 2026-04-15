@@ -27,12 +27,14 @@ export function EmailCapture() {
   }
 
   return (
-    <section className="rounded-2xl border border-violet-200 bg-violet-50 p-6">
-      <h2 className="text-lg font-semibold text-violet-950">Weekly digest</h2>
-      <p className="mt-1 text-sm text-violet-900/80">
-        Drop your email for a curated weekly mailshot of top cards. No accounts — double opt-in can be wired to Resend
-        in production.
-      </p>
+    <section className="lab-panel relative overflow-hidden p-6">
+      <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-cyan-400/20 blur-3xl" />
+      <div className="relative z-10">
+        <h2 className="lab-heading text-lg">Weekly biotech digest</h2>
+        <p className="lab-subtle mt-1 text-sm">
+          Get a curated weekly briefing of top cards across therapeutic areas. No account required.
+        </p>
+      </div>
       <form onSubmit={submit} className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input
           type="email"
@@ -40,17 +42,17 @@ export function EmailCapture() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@lab.org"
-          className="flex-1 rounded-lg border border-violet-200 px-3 py-2 text-sm outline-none ring-violet-500 focus:ring-2"
+          className="flex-1 rounded-lg border border-cyan-100/20 bg-slate-950/55 px-3 py-2 text-sm text-cyan-50 outline-none ring-cyan-300/60 focus:ring-2"
         />
         <button
           type="submit"
           disabled={busy}
-          className="rounded-lg bg-violet-700 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-800 disabled:opacity-60"
+          className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400 disabled:opacity-60"
         >
-          {busy ? "Saving…" : "Notify me"}
+          {busy ? "Saving..." : "Notify me"}
         </button>
       </form>
-      {status && <p className="mt-2 text-sm text-violet-900">{status}</p>}
+      {status && <p className="mt-2 text-sm text-cyan-100/85">{status}</p>}
     </section>
   );
 }
