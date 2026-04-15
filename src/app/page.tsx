@@ -1,101 +1,108 @@
-import Image from "next/image";
+import { Suspense } from "react";
+import { SearchFilter } from "@/components/SearchFilter";
+import { DiscoveryRails } from "@/components/DiscoveryRails";
+import { ResearchCard } from "@/components/ResearchCard";
+import { EmailCapture } from "@/components/EmailCapture";
+import { tryGetPool } from "@/lib/db/pool";
+import { listPapersWithSummaries, listPaperRecords } from "@/lib/db/hydration";
+import { getPaperById, searchPapers } from "@/lib/db/papers.repository";
+import { buildDiscoveryLists } from "@/services/ranking/discovery";
+import type { PaperSource, PaperWithSummary } from "@/lib/types/models";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+export const dynamic = "force-dynamic";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+function isPaperSource(s: string | undefined): s is PaperSource {
+  return s === "pubmed" || s === "arxiv" || s === "biorxiv";
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const resolvedParams = await searchParams;
+  const q = typeof resolvedParams.q === "string" ? resolvedParams.q : undefined;
+  const sourceRaw = typeof resolvedParams.source === "string" ? resolvedParams.source : undefined;
+  const source = isPaperSource(sourceRaw) ? sourceRaw : undefined;
+
+  const pool = tryGetPool();
+  if (!pool) {
+    return (
+      <div className="space-y-6">
+        <Hero />
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-950">
+          <p className="font-semibold">Database not configured</p>
+          <p className="mt-2">
+            Set <code className="rounded bg-white px-1">DATABASE_URL</code> to your Supabase Postgres connection string,
+            apply <code className="rounded bg-white px-1">database/schema.sql</code>, optionally load{" "}
+            <code className="rounded bg-white px-1">database/seed.sql</code>, then run{" "}
+            <code className="rounded bg-white px-1">npm run ingest</code> and{" "}
+            <code className="rounded bg-white px-1">npm run summarize</code>.
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <EmailCapture />
+      </div>
+    );
+  }
+
+  let papers: PaperWithSummary[];
+  const records = await listPaperRecords(pool, 400);
+
+  if (q || source) {
+    const rows = await searchPapers(pool, { q, source, limit: 40, offset: 0 });
+    const detailed: PaperWithSummary[] = [];
+    for (const p of rows) {
+      const full = await getPaperById(pool, p.id);
+      if (full) detailed.push(full);
+    }
+    papers = detailed;
+  } else {
+    papers = await listPapersWithSummaries(pool, 120);
+  }
+
+  const discovery = buildDiscoveryLists(papers, records);
+
+  return (
+    <div className="space-y-10">
+      <Hero />
+      <Suspense
+        fallback={<div className="h-24 animate-pulse rounded-2xl bg-slate-200" aria-label="Loading filters" />}
+      >
+        <SearchFilter />
+      </Suspense>
+      <DiscoveryRails
+        top10Today={discovery.top10Today}
+        trending={discovery.trending}
+        breakthrough={discovery.breakthrough}
+      />
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-2xl font-semibold text-slate-900">Latest research cards</h2>
+          <p className="text-sm text-slate-600">
+            Biomedical-heavy ranking by default. Expand any card via its title for the full view.
+          </p>
+        </div>
+        <div className="grid gap-4">
+          {papers.length === 0 && <p className="text-sm text-slate-500">No papers yet — run ingestion.</p>}
+          {papers.map((p) => (
+            <ResearchCard key={p.id} paper={p} compact />
+          ))}
+        </div>
+      </section>
+      <EmailCapture />
     </div>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="rounded-3xl bg-gradient-to-br from-violet-700 via-violet-600 to-indigo-700 p-8 text-white shadow-lg">
+      <p className="text-sm uppercase tracking-widest text-violet-100">Research intelligence</p>
+      <h1 className="mt-2 text-3xl font-bold md:text-4xl">Scan new science in under a minute — without losing trust.</h1>
+      <p className="mt-4 max-w-3xl text-sm text-violet-50 md:text-base">
+        ResearchCard aggregates open-access feeds, deduplicates them, and renders transparent AI cards that never pretend
+        to be peer review. Every numeric claim should be checked against the linked original article.
+      </p>
+    </section>
   );
 }
